@@ -31,7 +31,7 @@ Scenes:
 - `plot` and `wave` draw moving curves
 - `donut` is a shaded spinning torus
 - `wator` is a fish-and-shark agent model
-- `life` is Conway's Game of Life, including a glider
+- `life` is Conway's Game of Life: a glider on an empty field, so it can travel
 
 On a terminal, playback uses the alternate screen and restores the cursor on exit. Piped output just prints frames.
 

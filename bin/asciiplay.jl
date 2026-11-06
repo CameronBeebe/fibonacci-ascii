@@ -32,6 +32,14 @@ function parse_play_args(args)
         "--seed" => :seed,
         "--legs" => :legs,
     )
+    flag_bounds = Dict(
+        :nframes => (1, typemax(Int)),
+        :fps => (1, typemax(Int)),
+        :width => (1, typemax(Int)),
+        :height => (1, typemax(Int)),
+        :seed => (typemin(Int), typemax(Int)),
+        :legs => (1, 12),
+    )
     i = 1
     positional = String[]
     while i <= length(args)
@@ -42,7 +50,8 @@ function parse_play_args(args)
             opts[:list] = true
         elseif haskey(flags, arg)
             value, i = _need(args, i)
-            opts[flags[arg]] = parse(Int, value)
+            lo, hi = flag_bounds[flags[arg]]
+            opts[flags[arg]] = parse_cli_int(value, arg; lo, hi)
         elseif startswith(arg, "-")
             error("unknown option: $arg")
         else

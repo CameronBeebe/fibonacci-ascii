@@ -237,11 +237,10 @@ function wator_frame(tick::Int; width::Int, height::Int, seed::Int)
 end
 
 function life_frame(tick::Int; width::Int, height::Int, seed::Int)
+    # Empty field on purpose. A soup reaches this glider within a generation,
+    # so the documented traveler never leaves the corner. `seed` stays in the
+    # signature so callers match the other scenes; the glider does not use it.
     grid = falses(height, width)
-    rng = Random.MersenneTwister(seed)
-    for _ in 1:max(div(width * height, 7), 1)
-        grid[rand(rng, 1:height), rand(rng, 1:width)] = true
-    end
     if height >= 5 && width >= 6
         grid[2, 3] = true
         grid[3, 4] = true

@@ -78,6 +78,20 @@ end
     turned = life_step(blinker)
     @test turned[2, 3] && turned[3, 3] && turned[4, 3]
     @test count(turned) == 3
+
+    isolated = falses(16, 20)
+    isolated[2, 3] = true
+    isolated[3, 4] = true
+    isolated[4, 2] = isolated[4, 3] = isolated[4, 4] = true
+    for _ in 1:4
+        isolated = life_step(isolated)
+    end
+    frame = scene_frame("life", 4; width=20, height=16, seed=1)
+    chars = collect.(split(frame, '\n', keepempty=true))
+    for y in 1:16, x in 1:20
+        @test (chars[y][x] == '●') == isolated[y, x]
+    end
+    @test count(isolated) == 5
 end
 
 @testset "scenes move and stay rectangular" begin
@@ -108,6 +122,28 @@ end
     @test occursin("\"h\":5", payload)
     @test !occursin('\e', payload)
     @test !occursin("\e[", payload)
+end
+
+@testset "cli integers fail closed" begin
+    @test parse_cli_int("4", "legs"; lo=1, hi=12) == 4
+    @test parse_cli_int("-2", "seed") == -2
+    @test_throws ErrorException parse_cli_int("foo", "legs"; lo=1, hi=12)
+    @test_throws ErrorException parse_cli_int("0", "--fps"; lo=1)
+    @test_throws ErrorException parse_cli_int("13", "legs"; lo=1, hi=12)
+end
+
+@testset "scripts reject bad integers" begin
+    spiral = joinpath(@__DIR__, "..", "fibonacci_art.jl")
+    player = joinpath(@__DIR__, "..", "bin", "asciiplay.jl")
+    julia = Base.julia_cmd()
+    err = IOBuffer()
+    bad_legs = run(pipeline(ignorestatus(`$julia $spiral foo`), stdout=devnull, stderr=err))
+    @test !success(bad_legs)
+    @test occursin("legs must be an integer", String(take!(err)))
+    err = IOBuffer()
+    bad_fps = run(pipeline(ignorestatus(`$julia $player life --fps 0`), stdout=devnull, stderr=err))
+    @test !success(bad_fps)
+    @test occursin("--fps must be at least 1", String(take!(err)))
 end
 
 @testset "static fibonacci command is unchanged" begin

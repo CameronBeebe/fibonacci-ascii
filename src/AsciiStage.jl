@@ -5,7 +5,19 @@ using Random
 export fibonacci, lucas, arithmetic, geometric, triangular, primes, sequence,
        render_spiral, bars, Canvas, stamp!, line!, plot_function,
        Critter, wator_step, life_step, spiral_after, scene_frame, scene_names,
-       collect_frames, frames_jsonl
+       collect_frames, frames_jsonl, parse_cli_int
+
+function parse_cli_int(text::AbstractString, name::AbstractString; lo::Int=typemin(Int), hi::Int=typemax(Int))
+    value = tryparse(Int, text)
+    if value === nothing
+        error("$name must be an integer, got $(repr(text))")
+    elseif value < lo
+        error("$name must be at least $lo, got $value")
+    elseif value > hi
+        error("$name must be at most $hi, got $value")
+    end
+    return value
+end
 
 function fibonacci(n::Int)
     seq = Vector{Int}(undef, n)

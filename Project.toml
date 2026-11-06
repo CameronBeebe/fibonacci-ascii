@@ -1,0 +1,7 @@
+name = "AsciiStage"
+uuid = "87c2cf3e-eb2a-4a5f-9699-3d73e6eeab5a"
+version = "0.2.0"
+authors = ["Cameron Beebe"]
+
+[compat]
+julia = "1.10"
